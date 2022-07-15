@@ -6,6 +6,24 @@ from factor_analyzer import FactorAnalyzer
 
 
 def parallel_analysis(data, k=20, method="ml", return_ev=False):
+    """Parallel analysis to get the upper limit of how many factors to extract in the factor analysis.
+
+    Parameters
+    ----------
+    data : DataFrame
+        Behavioral data with subjects as rows and variables as columns
+    k : int, optional
+        How many random datasets to generate, by default 20
+    method : str, optional
+        Which factor extraction method to use, see factor_analyzer docs for details, by default "ml"
+    return_ev : bool, optional
+        Whether to return the eigenvalues from the factor analysis and the average eigenvalues from the parallel analysis, by default False
+
+    Returns
+    -------
+    int(, int, int) 
+        The number of factor suggested by parallel analysis and optionally the eigenvalues and average eigenvalues
+    """    
     import numpy as np
     import matplotlib.pyplot as plt
     from factor_analyzer import FactorAnalyzer
@@ -45,9 +63,29 @@ def parallel_analysis(data, k=20, method="ml", return_ev=False):
         return suggestedFactors
 
 def calculate_scores(data, loadings, uniquenesses, method = "bartlett"):
-    """
-    Calculate factor scores.
-    """
+    """Calculate factor scores.
+
+    Parameters
+    ----------
+    data : DataFrame
+        _description_
+    loadings : ndarray
+        Loading matrix.
+    uniquenesses : ndarray
+        Uniqueness matrix
+    method : str, optional
+        Method to extract scores, by default "bartlett"
+
+    Returns
+    -------
+    ndarray
+        Factor score matrix.
+
+    Raises
+    ------
+    NotImplementedError
+        Anderson method currently not implemented.
+    """    
     if method == "anderson":
         raise NotImplementedError
         #Z = data.to_numpy()
@@ -78,6 +116,7 @@ def calculate_scores(data, loadings, uniquenesses, method = "bartlett"):
 
 
 def hierarchical_fa(data, levels, method = "ml", score_method="bartlett"):
+    
     loadings = []
     scores = []
     for lvl in range(1, levels+1):
