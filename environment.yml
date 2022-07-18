@@ -1,0 +1,13 @@
+name: hcp-behavioral-domains
+channels:
+  - conda-forge
+  - desilinguist
+dependencies:
+  - python=3.8
+  - numpy
+  - pandas
+  - scipy
+  - scikit-learn
+  - r-base=4.1
+  - r-lavaan
+  - r-foreign
