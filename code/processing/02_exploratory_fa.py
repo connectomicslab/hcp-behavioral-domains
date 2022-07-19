@@ -74,27 +74,13 @@ def calculate_scores(data, loadings, uniquenesses, method = "bartlett"):
     uniquenesses : ndarray
         Uniqueness matrix
     method : str, optional
-        Method to extract scores, by default "bartlett"
+        Method to extract scores, options are "regression" and "bartlett", by default "bartlett"
 
     Returns
     -------
     ndarray
         Factor score matrix.
-
-    Raises
-    ------
-    NotImplementedError
-        Anderson method currently not implemented.
-    """    
-    if method == "anderson":
-        raise NotImplementedError
-        #Z = data.to_numpy()
-        U = np.diag(uniquenesses)
-        U_inv = np.linalg.inv(U)
-        #A = loadings
-        #
-        #f = Z@U_inv@A@G_inv_sq
-        B_t = (P.T@U_inv@R@U_inv@P)
+    """
     if method == "regression":
         X = data.to_numpy()
         R = data.corr()
@@ -116,7 +102,24 @@ def calculate_scores(data, loadings, uniquenesses, method = "bartlett"):
 
 
 def hierarchical_fa(data, levels, method = "ml", score_method="bartlett"):
-    
+    """Hierarchical factor analysis
+
+    Parameters
+    ----------
+    data : DataFrame
+        Dataset to perform the hierarchical factor analysis on
+    levels : int
+        How many levels to extract, corresponds to the maximum number of factors to compute
+    method : str, optional
+        Factor extraction method, for options see factor_analyzer documentation, by default "ml"
+    score_method : str, optional
+        Method to compute the factor scores, by default "bartlett"
+
+    Returns
+    -------
+    DataFrame, DataFrame
+        Factor loadings, factor scores
+    """    
     loadings = []
     scores = []
     for lvl in range(1, levels+1):
@@ -143,14 +146,28 @@ def hierarchical_fa(data, levels, method = "ml", score_method="bartlett"):
 
 
 def calculate_variance_explained(loadings):
-    # factor loadings squared then summed, divided by number of items, times 100 for percent
+    """Calculates percentage of variance explained: factor loadings are squared and then summed, divided by
+    number of items, times 100 for percent
+
+    Parameters
+    ----------
+    loadings : list of DataFrames
+        Factor loadings of several levels
+
+    Returns
+    -------
+    list
+        variance explained per level
+    """
     var_exp = []
     for i, l in enumerate(loadings):
         var_explained = np.sum(l**2)/l.shape[0]*100
         total_var_explained = np.sum(var_explained)
         var_exp.append(total_var_explained)
-        print(f"Percentage of variance explained by each factor for the {i+1}-factor solution:\n", var_explained)
-        print("Total variance explained:", round(total_var_explained, ndigits=2), "%\n")
+        print(
+            f"Percentage of variance explained by each factor for the {i+1}-factor solution:\n", var_explained)
+        print("Total variance explained:", round(
+            total_var_explained, ndigits=2), "%\n")
     return var_exp
 
 
@@ -163,8 +180,6 @@ if __name__ == "__main__":
     parser.add_argument('path_data', type=str)
     parser.add_argument('levels', type=int)
     parser.add_argument('out_path', type=str)
-    # parser.add_argument('--method', type=str)
-    # parser.add_argument('--score_method', type=str)
 
     args = parser.parse_args()
 
@@ -179,5 +194,3 @@ if __name__ == "__main__":
         num = str(i+1).zfill(2)
         l.to_csv(os.path.join(args.out_path, 'loadings', f'loadings_{num}.csv'))
         s.to_csv(os.path.join(args.out_path, 'scores', f'scores_{num}.csv'))
-
-# datalad run -i data/03_processed/all_preprocessed.csv -o data/04_exploratory_fa python code/processing/exploratory_fa.py {inputs[0]} 11 data/04_exploratory_fa/all

@@ -7,15 +7,29 @@ from sklearn.linear_model import LinearRegression
 
 
 def collect_data(path_unr, path_res, path_subjects, path_col_unr, path_col_res, out_path=None, filename='data'):
-    """
-    Collects the relevant variables from the HCP behavioral data and saves them as a csv file.
-    :param path_unr: Path to the unrestricted data saved as csv
-    :param path_res: Path to the restricted data saved as csv
-    :param path_subjects: Path to list of subjects to load saved as csv
-    :param path_col_unr: Path to list of columns to load from the unrestricted data saved as csv
-    :param path_col_res: Path to list of columns to load from the restricted data saved as csv
-    :param out_path: Filepath to save csv with data to, optional
-    :return: Collected data as pandas dataframe
+    """Collects the relevant variables from the HCP behavioral data and saves them as a csv file.
+
+    Parameters
+    ----------
+    path_unr : str
+        Path to the unrestricted data saved as csv
+    path_res : str
+        Path to the restricted data saved as csv
+    path_subjects : str
+        Path to list of subjects to load saved as csv
+    path_col_unr : str
+        Path to list of columns to load from the unrestricted data saved as csv
+    path_col_res : str
+        Path to list of columns to load from the restricted data saved as csv
+    out_path : str, optional
+        Filepath to save csv with data to, by default None
+    filename : str, optional
+        Filename to save csv with data, by default 'data'
+
+    Returns
+    -------
+    DataFrame
+        Collected data as pandas dataframe
     """
     # Read in csv to dataframe
     data_unr = pd.read_csv(path_unr, index_col="Subject")
@@ -34,11 +48,21 @@ def collect_data(path_unr, path_res, path_subjects, path_col_unr, path_col_res, 
     return data
 
 def impute_missing(data, out_path=None, filename='data'):
-    """
-    Takes the data as pandas dataframe, imputes using the MICE algorithm, returns imputed dataset.
-    :param data: dataset as dataframe
-    :param out_path: Filepath to save csv with data to, optional
-    :return: Imputed data as pandas dataframe
+    """Takes the data as pandas dataframe, imputes using the MICE algorithm, returns imputed dataset.
+
+    Parameters
+    ----------
+    data : DataFrame
+        Dataset to impute
+    out_path : str, optional
+        Filepath to save csv with data to, by default None
+    filename : str, optional
+        Filename for data csv, by default 'data'
+
+    Returns
+    -------
+    DataFrame
+        Imputed data as pandas dataframe
     """
     imputer = IterativeImputer(max_iter=100)
     data_np = imputer.fit_transform(data)
@@ -50,13 +74,25 @@ def impute_missing(data, out_path=None, filename='data'):
     return data_imputed
 
 def regress_confounders(data, path_unr, path_res, out_path=None, filename='data'):
-    """
-    Takes the data as pandas dataframe, regresses out age and gender, returns residuals as dataframe.
-    :param data: dataset as dataframe
-    :param path_unr: Path to the unrestricted data saved as csv
-    :param path_res: Path to the restricted data saved as csv
-    :param out_path: Filepath to save csv with data to, optional
-    :return: Residuals as pandas dataframe
+    """Takes the data as pandas dataframe, regresses out age and gender, returns residuals as dataframe.
+
+    Parameters
+    ----------
+    data : DataFrame
+        Dataset to regress
+    path_unr : str
+        Path to the unrestricted data saved as csv
+    path_res : str
+        Path to the restricted data saved as csv
+    out_path : str, optional
+        Filepath to save csv with data to, optional, by default None
+    filename : str, optional
+        Filename for data csv, by default 'data'
+
+    Returns
+    -------
+    DataFrame
+        Residuals of the regressed dataset
     """
     data_unr = pd.read_csv(path_unr, index_col="Subject")
     data_res = pd.read_csv(path_res, index_col="Subject")
@@ -85,12 +121,23 @@ def regress_confounders(data, path_unr, path_res, out_path=None, filename='data'
     return data_res
 
 def invert_columns(data, path_cols_inv, out_path=None, filename='data'):
-    """
-    Takes the data as pandas dataframe, inverts the given columns, returns dataset as dataframe.
-    :param data: Dataset as dataframe
-    :param path_cols_inv: Path to csv containing columns to invert
-    :param out_path: Filepath to save csv with data to, optional
-    :return: Dataset with inverted values as pandas dataframe
+    """Takes the data as pandas dataframe, inverts the given columns, returns dataset as dataframe.
+
+    Parameters
+    ----------
+    data : DataFrame
+        Dataset with columns to invert
+    path_cols_inv : DataFrame
+        Path to csv containing columns to invert
+    out_path : str, optional
+        Filepath to save csv with data to, by default None
+    filename : str, optional
+        Filename for data csv, by default 'data'
+
+    Returns
+    -------
+    DataFrame
+        Dataset with inverted values
     """
     cols_to_invert = pd.read_csv(path_cols_inv, header=None).to_numpy().T[0]
     max_vals = data.loc[:, cols_to_invert].max(axis=0) # maximum value for RT columns
@@ -101,11 +148,21 @@ def invert_columns(data, path_cols_inv, out_path=None, filename='data'):
     return data_inv
 
 def z_score(data, out_path=None, filename='data'):
-    """
-    Z-scores data
-    :param data: Dataset as dataframe
-    :param out_path: Filepath to save csv with data to, optional
-    :return: Dataset with z-scored values as pandas dataframe
+    """Z-scores data
+
+    Parameters
+    ----------
+    data : DataFrame
+        Dataset to z-score
+    out_path : str, optional
+        Filepath to save csv with data to, by default None
+    filename : str, optional
+        Filename for data csv, by default 'data'
+
+    Returns
+    -------
+    DataFrame
+        Dataset with z-scored values
     """
     # z-score variables
     mean = data.mean().values
@@ -130,12 +187,6 @@ if __name__ == "__main__":
     parser.add_argument('--filename', type=str)
 
     args = parser.parse_args()
-    # path_unr = "../../data/01_inputs/hcp_behavioral.csv"
-    # path_res = "../../data/01_inputs/hcp_behavioral_RESTRICTED.csv"
-    # path_subjects = "../data/02_intermediate/train_subjects.csv"
-    # path_col_unr = "../../data/02_intermediate/col_unr.csv"
-    # path_col_res = "../../data/02_intermediate/col_res.csv"
-    # path_rt_cols = "../../data/02_intermediate/rt_cols.csv"
 
     data = collect_data(args.path_unr, args.path_res, args.path_subjects, args.path_col_unr, args.path_col_res,
                         args.out_path, args.filename)
@@ -144,5 +195,3 @@ if __name__ == "__main__":
     data_inv = invert_columns(data_res, args.path_rt_cols, args.out_path, args.filename)
     data_z = z_score(data_inv, args.out_path, args.filename)
     data_z.to_csv(os.path.join(args.out_path, '..', '03_processed', f'{args.filename}_preprocessed.csv'))
-
-    # datalad run -i data/01_inputs/hcp_behavioral.csv -i data/01_inputs/hcp_behavioral_RESTRICTED.csv -i data/02_intermediate/all_subjects.csv -i data/02_intermediate/col_unr.csv -i data/02_intermediate/col_res.csv -i data/02_intermediate/rt_cols.csv -o data/02_intermediate/ -o data/03_processed/ "python code/processing/preprocessing.py data/01_inputs/hcp_behavioral.csv data/01_inputs/hcp_behavioral_RESTRICTED.csv data/02_intermediate/all_subjects.csv data/02_intermediate/col_unr.csv data/02_intermediate/col_res.csv data/02_intermediate/rt_cols.csv --out_path data/02_intermediate --filename all"

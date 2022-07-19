@@ -6,9 +6,13 @@ def train_test_split(path_res, out_path):
     """
     Creates train and test subsets of the data, making sure that members of the same family are in the same split. Saves
     the subject IDs of the respective subsets as csv files.
-    :param path_res: Path to the restricted data saved as csv
-    :param out_path: Path to save the csvs to
-    :return: Nothing
+
+    Parameters
+    ----------
+    path_res : str
+        Path to the restricted data saved as csv
+    out_path : str
+        Path to save the csvs to
     """
     data_res = pd.read_csv(path_res)
     gss = GroupShuffleSplit(n_splits=1, test_size=0.5, random_state=42)

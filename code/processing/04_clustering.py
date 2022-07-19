@@ -4,13 +4,22 @@ from sklearn.cluster import KMeans
 
 
 def consensus_clustering(data, method, iterations, frac, clusters, verbose=False):
-    """Consensus clustering
-    data: data matrix as pandas dataframe
-    method: clustering algorithm to use
-    frac: fraction of data to resample
-    iterations: how many times the data should be resampled
-    clusters: range of how many clusters, tuple(minimum, maximum)
-    verbose: verbosity, bool
+    """Run consensus clustering
+
+    Parameters
+    ----------
+    data : DataFrame
+        Dataset to do consensus clustering on
+    method : object
+        Clustering method to use, should have a fit_predict method
+    iterations : int
+        Number of iterations to run
+    frac : float
+        Fraction of data to resample
+    clusters : tuple(minimum, maximum)
+        Range of how many clusters to find
+    verbose : bool, optional
+        Verbosity, by default False
     """
     # object to store consensus matrices
     Mks = []
@@ -61,6 +70,18 @@ def consensus_clustering(data, method, iterations, frac, clusters, verbose=False
 
 
 def calculate_cluster_consensus(Mks):
+    """Clustering of the consensus matrices.
+
+    Parameters
+    ----------
+    Mks : list of DataFrames
+        Consensus matrices
+
+    Returns
+    -------
+    DataFrame, list of dictionaries, array
+        Cluster consensus matrix, predictions, prediction labels
+    """    
     """
     Clustering of the consensus matrices.
     :param Mks: Consensus matrices as list of dataframes
@@ -162,5 +183,3 @@ if __name__ == '__main__':
     for i, Mk in enumerate(Mks):
         num = str(i+args.min_clusters).zfill(2)
         Mk.to_csv(os.path.join(args.out_path+outfolder, f'consensus_matrix_{num}_clusters.csv'))
-
-    #datalad run -i data/03_processed/train_preprocessed.csv -o data/06_clustering/ python code/processing/clustering.py {inputs[0]} 2 13 1000 {outputs[0]} -v True

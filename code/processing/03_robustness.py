@@ -10,7 +10,23 @@ from sklearn.decomposition import PCA, FastICA
 from scipy.optimize import linear_sum_assignment
 
 
-def subsample(data, sample_type="subjects"):
+def subsample(data, sample_type="subjects", fraction=0.8):
+    """Draws a sample of the dataset.
+
+    Parameters
+    ----------
+    data : DataFrame
+        Dataset to sample from
+    sample_type : str, optional
+        To sample "subjects" or "variables", by default "subjects"
+    fraction : float, optional
+        Size of sample as fraction (between 0.0 and 1.0), by default 0.8
+
+    Returns
+    -------
+    DataFrame
+        The subsample
+    """    
     """
     Draws a sample of the dataset.
     :param data: Dataframe to sample from
@@ -18,13 +34,38 @@ def subsample(data, sample_type="subjects"):
     :return:
     """
     if sample_type == "subjects":
-        sample = data.sample(frac=0.8, replace=False)
+        sample = data.sample(frac=fraction, replace=False)
     elif sample_type == "variables":
-        sample = data.sample(frac=0.8, replace=False, axis=1)
+        sample = data.sample(frac=fraction, replace=False, axis=1)
     return sample
 
 
 def run_method(data, n_factors, iterations, sample_type, method):
+    """Runs the specified dimension reduction method for the given number of iterations.
+
+    Parameters
+    ----------
+    data : DataFrame
+        Dataset to test robustness on
+    n_factors : int
+        Number of factors or components to extract
+    iterations : int
+        How many iterations to run
+    sample_type : str
+        "subjects" or "variables"
+    method : str
+        "fa", "pca", or "ica"
+
+    Returns
+    -------
+    list of DataFrames
+        Loadings for each iteration
+
+    Raises
+    ------
+    NotImplementedError
+        Raised when the given method is not implemented
+    """    
     # run method for specified number of iterations
     loadings = []
     for i in range(iterations):
@@ -68,7 +109,24 @@ def run_method(data, n_factors, iterations, sample_type, method):
 
 # orthogonal rotation method from scikit-learn's factor analysis
 def ortho_rotation(components, method="varimax", tol=1e-6, max_iter=100):
-    """Return rotated components."""
+    """Return rotated components.
+
+    Parameters
+    ----------
+    components : array
+        Component matrix to rotate
+    method : str, optional
+        rotation method, "varimax" or "quartimax", by default "varimax"
+    tol : float, optional
+        Precision, by default 1e-6
+    max_iter : int, optional
+        Maximum number of iterations, by default 100
+
+    Returns
+    -------
+    array
+        Rotated components
+    """
     nrow, ncol = components.shape
     rotation_matrix = np.eye(ncol)
     var = 0
@@ -90,6 +148,19 @@ def ortho_rotation(components, method="varimax", tol=1e-6, max_iter=100):
 
 
 def reorder_factors(loadings):
+    """Reorders the order of factors with the Hungarian algorithm, using absolute
+    correlation as the criterium. All loading matrices are fit to the first one.
+
+    Parameters
+    ----------
+    loadings : list of DataFrames
+        Loading matrix per iteration
+
+    Returns
+    -------
+    list of DataFrames
+        Reordered loadings
+    """    
     n_factors = loadings[0].shape[1]
     loadings_reordered = []
     for i, l in enumerate(loadings):
@@ -107,6 +178,18 @@ def reorder_factors(loadings):
 
 
 def calculate_abs_corr(loadings_reordered):
+    """Calculate the absolute correlation for each factor over subsamples/iterations.
+
+    Parameters
+    ----------
+    loadings_reordered : list of DataFrames
+        Reordered loadings
+
+    Returns
+    -------
+    array
+        Absolute correlations
+    """    
     loadings_np = np.array(loadings_reordered)
     abs_corr = []
     for i in range(loadings_np.shape[2]):
@@ -120,6 +203,28 @@ def calculate_abs_corr(loadings_reordered):
 
 
 def robustness(data, n_factors, method, path, iterations=1000, sample_type="subjects"):
+    """Runs the robustness pipeline.
+
+    Parameters
+    ----------
+    data : DataFrame
+        Data to analyze robustness of
+    n_factors : int
+        Maximum number of factors/components
+    method : str
+        Extraction method
+    path : str
+        Output folder
+    iterations : int, optional
+        Number of iterations to run, by default 1000
+    sample_type : str, optional
+        "subjects" or "variables", by default "subjects"
+
+    Returns
+    -------
+    list of DataFrames
+        Reordered loading matrices
+    """    
     print(f"Running {method} with {iterations} iterations")
     # abs_correlations = []
     for i in range(1, n_factors+1):
@@ -143,10 +248,19 @@ def robustness(data, n_factors, method, path, iterations=1000, sample_type="subj
 
 
 def avg_ac(abs_cor):
-    """
-    Create 2D array containing the average absolute correlation for each level
+    """Create 2D array containing the average absolute correlation for each level
     and factor/component in that level in the lower triangle, with the upper
     triangle and main diagonal padded with zeros for plotting.
+
+    Parameters
+    ----------
+    abs_cor : DataFrame
+        Absolute correlations between factors over iterations
+
+    Returns
+    -------
+    DataFrame
+        Average absolute correlations
     """
     avg_ac = np.ones((len(abs_cor),len(abs_cor))) # array to fill
     for i, c in enumerate(abs_cor):

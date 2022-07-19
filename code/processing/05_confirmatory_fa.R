@@ -10,6 +10,7 @@ if (length(args)==0) {
 data <- read.csv(args[1], row.names='Subject')
 
 print('4 Factors, threshold 0.45')
+# 4-factor model, using variables with loadings > 0.45 as indicator variables
 
 model_4f_t45 <- '
 factor1 =~ AngAffect_Unadj+ AngHostil_Unadj+ FearAffect_Unadj+ Sadness_Unadj+ LifeSatisf_Unadj+ MeanPurp_Unadj+ PosAffect_Unadj+ Friendship_Unadj+ Loneliness_Unadj+ PercHostil_Unadj+ PercReject_Unadj+ EmotSupp_Unadj+ PercStress_Unadj+ SelfEff_Unadj+ NEOFAC_N+ DSM_Depr_Raw+ DSM_Anxi_Raw+ DSM_Somp_Raw+ DSM_Avoid_Raw+ DSM_Adh_Raw+ DSM_Antis_Raw
@@ -23,6 +24,7 @@ fit_4f_t45 <- cfa(model_4f_t45, data=data, std.lv=TRUE, estimator='MLR')
 summary(fit_4f_t45, fit.measures=TRUE, standardized = TRUE)
 
 print('5 Factors, threshold 0.45')
+# 5-factor model, using variables with loadings > 0.45 as indicator variables
 
 model_5f_t45 <- 'factor1 =~ AngHostil_Unadj+ Sadness_Unadj+ LifeSatisf_Unadj+ MeanPurp_Unadj+ PosAffect_Unadj+ Friendship_Unadj+ Loneliness_Unadj+ PercReject_Unadj+ EmotSupp_Unadj+ InstruSupp_Unadj+ PercStress_Unadj+ SelfEff_Unadj+ NEOFAC_N+ NEOFAC_E+ DSM_Avoid_Raw
 factor2 =~ PMAT24_A_CR+ PMAT24_A_RTCR+ ReadEng_Unadj+ PicVocab_Unadj+ VSPLOT_OFF+ Language_Task_Math_Acc+ Relational_Task_Rel_Acc+ WM_Task_Acc
