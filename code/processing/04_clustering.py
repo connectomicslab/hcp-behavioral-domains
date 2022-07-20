@@ -162,12 +162,12 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('path_data', type=str)
-    parser.add_argument('min_clusters', type=int)
-    parser.add_argument('max_clusters', type=int)
-    parser.add_argument('iterations', type=int)
-    parser.add_argument('out_path', type=str)
-    parser.add_argument('--verbose', '-v', type=bool, default=False)
+    parser.add_argument('path_data', type=str, help="Path to the preprocessed data saved as csv")
+    parser.add_argument('min_clusters', type=int, help="Minimum number of clusters")
+    parser.add_argument('max_clusters', type=int, help="Maximum number of clusters")
+    parser.add_argument('iterations', type=int, help="Number of iterations to run")
+    parser.add_argument('out_path', type=str, help="Folder to save the consensus matrices in")
+    parser.add_argument('--verbose', '-v', type=bool, default=False, help="Verbosity")
 
     args = parser.parse_args()
 

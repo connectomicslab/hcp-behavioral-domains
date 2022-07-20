@@ -177,9 +177,9 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('path_data', type=str)
-    parser.add_argument('levels', type=int)
-    parser.add_argument('out_path', type=str)
+    parser.add_argument('path_data', type=str, help="Path to the preprocessed data saved as csv")
+    parser.add_argument('levels', type=int, help="How many levels to extract")
+    parser.add_argument('out_path', type=str, help="Folder to save the loadings and scores in")
 
     args = parser.parse_args()
 

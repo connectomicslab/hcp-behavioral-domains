@@ -177,14 +177,14 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('path_unr', type=str)
-    parser.add_argument('path_res', type=str)
-    parser.add_argument('path_subjects', type=str)
-    parser.add_argument('path_col_unr', type=str)
-    parser.add_argument('path_col_res', type=str)
-    parser.add_argument('path_rt_cols', type=str)
-    parser.add_argument('--out_path', '-o', type=str)
-    parser.add_argument('--filename', type=str)
+    parser.add_argument('path_unr', type=str, help="Path to the unrestricted data saved as csv")
+    parser.add_argument('path_res', type=str, help="Path to the restricted data saved as csv")
+    parser.add_argument('path_subjects', type=str, help="Path to the subject list")
+    parser.add_argument('path_col_unr', type=str, help="Path to the list of variables from the unrestricted data")
+    parser.add_argument('path_col_res', type=str, help="Path to the list of variables from the unrestricted data")
+    parser.add_argument('path_rt_cols', type=str, help="Path to the list of variables to invert")
+    parser.add_argument('--out_path', '-o', type=str, help="Folder to save the preprocessed data in")
+    parser.add_argument('--filename', type=str, help="Filename for saving the preprocessed data")
 
     args = parser.parse_args()
 

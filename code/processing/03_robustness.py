@@ -278,11 +278,11 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('path_data', type=str)
+    parser.add_argument('path_data', type=str, help="Path to the preprocessed data saved as csv")
     parser.add_argument('max_level', type=int, help="Maximum number of levels to run")
-    parser.add_argument('method', type=str, choices=['fa', 'pca', 'ica'])
-    parser.add_argument('out_path', type=str)
-    parser.add_argument('--iterations', type=int, default=1000)
+    parser.add_argument('method', type=str, choices=['fa', 'pca', 'ica'], help="What dimension reductio method to use")
+    parser.add_argument('out_path', type=str, help="Folder to save the loadings in")
+    parser.add_argument('--iterations', type=int, default=1000, help="Number of iterations to run")
 
     args = parser.parse_args()
 
